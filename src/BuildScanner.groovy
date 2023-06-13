@@ -1,4 +1,5 @@
 import groovy.io.FileType
+import org.apache.commons.io.FileUtils
 
 import java.text.SimpleDateFormat
 
@@ -19,12 +20,13 @@ class BuildScanner {
         scanner.menu()
     }
 
-    String srcDir, dstDir
+    String srcDir, destDir
     long lastModified = 0L
     Set<File> laterFiles = new HashSet<>()
 
     BuildScanner(String srcDir, String destDir) {
         this.srcDir = srcDir
+        this.destDir = destDir
         scanDir(srcDir, FIRST_SCAN)
 //        if (anyLaterFiles) {
 //
@@ -33,7 +35,22 @@ class BuildScanner {
 
     def rescan() {
         scanDir(srcDir, SUBSEQUENT_SCAN)
-        laterFiles.stream().forEach { File file -> { System.out.println(file.path) } }
+        laterFiles.stream().forEach {
+            File file -> {
+                String stem = file.path.replace(SRC_APP_DIR, "").replace(file.name, "")
+                System.out.println("Copying file: " + file.name + " to " + destDir + stem + ".")
+                String[] cmd = ["/bin/bash", "-c","echo | sudo -S cp " + file.path + " " + destDir + stem + "."]
+                Process p = Runtime.getRuntime().exec(cmd)
+                BufferedReader is = new BufferedReader(new InputStreamReader(p.getErrorStream(  )));
+                def line
+                while ((line = is.readLine(  )) != null)
+                    System.out.println(line);
+                is = new BufferedReader(new InputStreamReader(p.getInputStream(  )));
+                while ((line = is.readLine(  )) != null)
+                    System.out.println(line);
+                //FileUtils.copyFileToDirectory(file, new File(destDir + stem))
+            }
+        }
     }
 
     def scanDir(String dir, boolean firstScan) {
@@ -47,12 +64,13 @@ class BuildScanner {
     def scanFile(File dir, boolean firstScan) {
         //System.out.println("Scanning directory: " + dir.path)
         dir.eachFileMatch(FileType.FILES, ~/^.+.jsp$/, { File file ->
+            //System.out.println("Examining: " + file.path)
             if (file.lastModified() > lastModified) {
                 if (firstScan) {
                     lastModified = file.lastModified()
                 } else {
                     laterFiles.add(file)
-                    System.out.println("Found file: " + file.path)
+                    //System.out.println("Found file: " + file.path)
                 }
             }
         })
