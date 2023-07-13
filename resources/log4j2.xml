@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="30" status="warn" strict="true" name="test" packages="">
+
+    <Appenders>
+        <Appender name="applog" type="File" fileName="app.log">
+            <Layout type="PatternLayout" pattern="%d{DATE} %-5p [%c %x] %m%n"/>
+        </Appender>
+        <Appender name="threadlog" type="File" fileName="threads.log">
+            <Layout type="PatternLayout" pattern="%d{DATE} %-5p [%c %x] %m%n"/>
+        </Appender>
+    </Appenders>
+
+
+    <Loggers>
+        <Logger name="com.teramedica" level="debug" additivity="false">
+            <AppenderRef ref="applog"/>
+        </Logger>
+
+        <Logger name="threadlogger" level="debug" additivity="false">
+            <AppenderRef ref="threadlog"/>
+        </Logger>
+
+        <Logger name="logparse" level="info" additivity="false">
+            <AppenderRef ref="applog"/>
+        </Logger>
+
+        <Root level="info">
+            <AppenderRef ref="applog"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

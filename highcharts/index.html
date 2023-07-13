@@ -1,0 +1,64 @@
+<html>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var options = {
+            chart: {
+                type: 'line',
+                scrollablePlotArea: {
+                    minWidth: 1200,
+                    scrollPositionX: 1
+                },
+                zoomType: 'x'
+            },
+            title: {
+                text: 'VNA Threads'
+            },
+            xAxis: {
+                type: 'datetime',
+                // dateTimeLabelFormats: {
+                //      day: '%e %b %H:%M',
+                // }
+             },
+             yAxis: {
+                title: {
+                    text: 'Threads'
+                }
+             },
+            series: []
+        };
+
+        /*var showData = $('#show-data');
+        $.getJSON('data.json', function (data) {
+            console.log(data);
+
+            var items = data.map(function (item) {
+                return item[0] + ': ' + item[1];
+            });
+
+            showData.empty();
+
+            if (items.length) {
+                var content = '<li>' + items.join('</li><li>') + '</li>';
+                var list = $('<ul />').html(content);
+                showData.append(list);
+            }
+        });
+        showData.text('Loading the JSON file.');*/
+
+       $.getJSON('process-threads.json', function(data) {
+                   options.series.push(data.series1);
+                   options.series.push(data.series2);
+                   options.series.push(data.series3);
+                   options.series.push(data.series4);
+                   options.series.push(data.series5);
+               var chart = new Highcharts.chart('container', options);
+           });
+      });
+  </script>
+  <body>
+  <div id="container" style="width:100%; height:400px;"></div>
+  <div id="show-data" style="width:100%"></div>
+  </body>
+</html>
